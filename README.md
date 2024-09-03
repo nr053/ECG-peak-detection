@@ -1,15 +1,8 @@
 # ECG_peak_detection
 Robust R-peak detection in an electrocardiogram with stationary wavelet transformation and separable convolution
 
-## Requirements
-* Python version >= 3.9.7 
-* PyTorch version >= 1.8.2 
-* WFDB version >= 3.4.1 
-* SciPy version >= 1.7.3 
-* PyWavelets version >= 1.2.0 
-
 ## Prepare databases
-You need to manually download ECG databases in PhysioNet and Dataverse. Download link is like below.
+Relevant databases can be downloaded here:
 * MIT_BIH: https://physionet.org/content/mitdb/1.0.0/
 * INCART: https://physionet.org/content/incartdb/1.0.0/
 * QT(DB): https://physionet.org/content/qtdb/1.0.0/
