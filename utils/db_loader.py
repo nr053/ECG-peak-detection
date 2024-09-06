@@ -127,8 +127,8 @@ class DB_loading:
 
         if verbose == True:
             print('Database : {0}, Patient : {1}'.format(database, patient))
-
-        if database != 'TELE':
+        
+        elif database != 'TELE':
             # load data
             record = wfdb.rdsamp(path_file)
             ecg = record[0][:, num]
