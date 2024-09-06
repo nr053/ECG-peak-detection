@@ -2,3 +2,5 @@ __pycache__
 *.html
 *.png
 venv/
+*.edf
+*.csv
