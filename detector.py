@@ -2,6 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import time
 from utils.evaluator import Evaluator
+from tqdm import tqdm
+import sys, errno
 
 peak_detector = Evaluator()
 
@@ -44,21 +46,33 @@ print(table_summary)
 
 
 ### Visualize a specific ECGs
-t_idx = 0
-t_patient = table_summary.index[t_idx]
-t_ecg = peak_detector.set_dict['ecg'][t_idx]
-t_label = peak_detector.set_dict['label'][t_idx]
-t_pred_TP = peak_detector.set_dict['pred_TP'][t_idx]
-t_pred_FP = peak_detector.set_dict['pred_FP'][t_idx]
-t_pred_FN = peak_detector.set_dict['pred_FN'][t_idx]
-t_xtick = np.arange(t_ecg.shape[0])/360
+# t_idx = 0
+# t_patient = table_summary.index[t_idx]
+# t_ecg = peak_detector.set_dict['ecg'][t_idx]
+# t_label = peak_detector.set_dict['label'][t_idx]
+# t_pred_TP = peak_detector.set_dict['pred_TP'][t_idx]
+# t_pred_FP = peak_detector.set_dict['pred_FP'][t_idx]
+# t_pred_FN = peak_detector.set_dict['pred_FN'][t_idx]
+# t_xtick = np.arange(t_ecg.shape[0])/360
 
-plt.plot(t_xtick, t_ecg, color='black')
-plt.plot(t_xtick[t_pred_TP], [t_ecg[x] for x in t_pred_TP], 'o', color='green')
-plt.plot(t_xtick[t_pred_FP], [t_ecg[x] for x in t_pred_FP], '*', color='red')
-if len(t_pred_FN) > 0:
-    plt.plot(t_xtick[t_pred_FN], [t_ecg[x] for x in t_pred_FN], '*', color='blue')
-plt.title('Database {}, Patient {}'.format(test_database, t_patient))
-plt.xlabel('Time (s)')
-plt.ylabel('Voltage (mV)')
-plt.savefig('/home/rose/Cortrium/ECG_peak_detection/results.png')
+# plt.plot(t_xtick, t_ecg, color='black')
+# plt.plot(t_xtick[t_pred_TP], [t_ecg[x] for x in t_pred_TP], 'o', color='green')
+# plt.plot(t_xtick[t_pred_FP], [t_ecg[x] for x in t_pred_FP], '*', color='red')
+# if len(t_pred_FN) > 0:
+#     plt.plot(t_xtick[t_pred_FN], [t_ecg[x] for x in t_pred_FN], '*', color='blue')
+# plt.title('Database {}, Patient {}'.format(test_database, t_patient))
+# plt.xlabel('Time (s)')
+# plt.ylabel('Voltage (mV)')
+# plt.savefig('/home/rose/Cortrium/ECG-peak-detection/results.png')
+
+
+
+### plot the bad examples
+#try:
+for idx in tqdm(table_summary[table_summary["sensitivity"] < 0.5].index):
+    if idx == len(peak_detector.set_dict["ecg"]):
+        continue
+    peak_detector.db_loading.visualise(peak_detector.set_dict, idx)
+#except IOError as e:
+#    if e.errno == errno.EPIPE:
+#        pass
