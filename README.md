@@ -8,9 +8,9 @@ Robust R-peak detection in an electrocardiogram with stationary wavelet transfor
 - clone repo
 - create virtual environment
 - activate venv
-````
-- pip install -r requirements.txt
-````
+
+- ```` pip install -r requirements.txt ````
+
 ## How to use
 - activate venv
 - python detector.py <DATABASE> <optional arguments>
