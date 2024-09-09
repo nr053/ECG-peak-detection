@@ -24,9 +24,8 @@ Flag           Note                                                             
 ```
 ### Output
 A dataframe containing the inputs and outputs from the model are saved in "set_dict.csv". 
-"ecg" contains the raw ECG data
-"label" contains the ground truth index of beat positions
-"pred_position" contains the index of beat positions output by the model
+The "ecg" column contains the raw ECG data, the "label" column contains the ground truth index of beat positions and the
+"pred_position" contains the index of beat positions output by the model.
 
 An overview of the model performance is saved in "table_summary.csv".
 
