@@ -22,7 +22,7 @@ Flag           Note                                                             
 --database     A path to the directory containing VAF files or a string denoting the desired dataset option.            -      
 --visualise    optional tag to generate plots of examples with less than 50% sensitivity                              False                          
 ```
-
+### Output
 A dataframe containing the inputs and outputs from the model are saved in "set_dict.csv". 
 "ecg" contains the raw ECG data
 "label" contains the ground truth index of beat positions
