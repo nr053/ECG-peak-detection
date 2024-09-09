@@ -13,7 +13,7 @@ Robust R-peak detection in an electrocardiogram with stationary wavelet transfor
 
 ## How to use
 - activate venv
-- python detector.py <DATABASE> <optional arguments>
+- ```` python detector.py <DATABASE> <optional arguments> ````
 
 Arguments:
 - database: A path to the directory containing VAF files or a string denoting the desired dataset 
