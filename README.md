@@ -17,10 +17,10 @@ Robust R-peak detection in an electrocardiogram with stationary wavelet transfor
 
 ### Arguments:
 ```
-Flag                        Note                                                                                                          Default
--h, --help                  show this help message and exit                
---database                  A path to the directory containing VAF files or a string denoting the desired dataset option.                   -      
---visualise                optional tag to generate plots of examples with less than 50% sensitivity                                      False                          
+Flag           Note                                                                                                  Default
+-h, --help     show this help message and exit                
+--database     A path to the directory containing VAF files or a string denoting the desired dataset option.            -      
+--visualise    optional tag to generate plots of examples with less than 50% sensitivity                              False                          
 ```
 
 A dataframe containing the inputs and outputs from the model are saved in "set_dict.csv". 
