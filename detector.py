@@ -4,18 +4,19 @@ import time
 from utils.evaluator import Evaluator
 from tqdm import tqdm
 import sys, errno
+import argparse
+import pandas as pd
 
-peak_detector = Evaluator()
+parser = argparse.ArgumentParser(
+                        prog="detector.py",
+                        description="find the positions of R-peaks in a collection of ECG samples"
+)
+parser.add_argument("database", help="path to data or selected database name (MIT-BIH, INCART, QTDB, etc.)")
+parser.add_argument("-v", "--visualise", help="visualise examples of poor performance", action='store_true')
+args = parser.parse_args()
 
+database = args.database
 
-### Select database
-test_database = 'MIT_BIH'
-# test_database = 'INCART'
-# test_database = 'QTDB'
-#test_database = 'MIT_BIH_ST'
-# test_database = 'European_ST_T'
-# test_database = 'TELE'
-#test_database = 'VAF'
 
 '''
 The current model was developed by training MIT_BIH, INCART, and QT databases.
@@ -23,11 +24,12 @@ If you test these databases, you will see the performance in the training set.
 Cross-database testing is available when you test MIT_BIH_ST, European_ST_T, and TELE databases.
 '''
 
+peak_detector = Evaluator(database)
 
 ### Run peak detection pipeline
-print('Database ... {0}'.format(test_database))
+print('Database ... {0}'.format(database))
 start = time.time()
-peak_detector.load(test_database)
+peak_detector.load(database)
 peak_detector.find_peaks()
 end = time.time()
 elapsed = end-start
@@ -44,6 +46,9 @@ table_summary = table_summary.round(decimals=4)
 print('Summary of model performance')
 print(table_summary)
 
+table_summary.to_csv("table_summary.csv")
+dict = pd.DataFrame.from_dict(peak_detector.set_dict)
+dict.to_csv("set_dict.csv")
 
 ### Visualize a specific ECGs
 # t_idx = 0
@@ -67,12 +72,9 @@ print(table_summary)
 
 
 
-### plot the bad examples
-#try:
-for idx in tqdm(table_summary[table_summary["sensitivity"] < 0.5].index):
-    if idx == len(peak_detector.set_dict["ecg"]):
-        continue
-    peak_detector.db_loading.visualise(peak_detector.set_dict, idx)
-#except IOError as e:
-#    if e.errno == errno.EPIPE:
-#        pass
+# plot the bad examples
+if args.visualise:
+    for idx in tqdm(table_summary[table_summary["sensitivity"] < 0.5].index):
+        if idx == len(peak_detector.set_dict["ecg"]):
+            continue
+        peak_detector.db_loading.visualise(peak_detector.set_dict, idx)
