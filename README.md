@@ -17,17 +17,11 @@ Robust R-peak detection in an electrocardiogram with stationary wavelet transfor
 
 ### Arguments:
 ```
-- database: A path to the directory containing VAF files or a string denoting the desired dataset 
-options:   
-                        'MIT_BIH',
-                        'INCART',
-                        'QTDB',
-                        'MIT_BIH_ST',
-                        'European_ST_T',
-                        'TELE',
-                        'VAF',
-                        'EDF'
--visualise: optional tag to generate plots of examples with less than 50% sensitivity
+Flag                        Note                                                Default
+-h, --help                  show this help message and exit
+--database  A path to the directory containing VAF files or a string denoting the desired dataset 
+option               -
+--visualise      optional tag to generate plots of examples with less than 50% sensitivity                    False
 ```
 
 A dataframe containing the inputs and outputs from the model are saved in "set_dict.csv". 
