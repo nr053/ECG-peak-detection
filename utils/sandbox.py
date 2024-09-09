@@ -4,6 +4,15 @@ import plotly.graph_objects as go
 from helper_functions import return_good_ecg_channel_idx_based_on_lead_off
 import mne
 import numpy as np
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("-v", "--Visualise", help="visualise examples of poor performance", action='store_true')
+parser.add_argument("-d", "--Data", help="database to use")
+args = parser.parse_args()
+
+print(args.Visualise)
+print(args.Data)
 
 #edf
 raw = mne.io.read_raw_edf("/home/rose/Cortrium/ECG-peak-detection/edf1.edf", preload=True)
