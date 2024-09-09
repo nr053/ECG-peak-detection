@@ -19,11 +19,8 @@ fs_resampling = 360
 duration = 0.15 # 150ms
 
 class VAF_loading:
-    def __init__(self):
-        # path definition
-        path_base = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
-        #self.path_database = '/home/rose/Cortrium/R-peak-detector/VAF_subset/test/'
-        self.path_database = '/home/rose/Cortrium/R-peak-detector/10k/VAF_subset/'
+    def __init__(self, path_to_data):
+        self.path_database = path_to_data
 
     ### filtering method
     def dwt_idwt(self, array, wavelet='db3', level=9):
@@ -160,8 +157,6 @@ class VAF_loading:
         set_dict['target'] = []
         set_dict['mask_array'] = []
 
-
-
         for file in tqdm(file_names):
             ecg, label, start_times, fs, lead_off, strip_types, mask = self.load_data(file)
             
@@ -180,17 +175,22 @@ class VAF_loading:
 
             for ecg_strip, lead_off_list, label_strip, start_time, strip_type in zip(ecg, lead_off, label, start_times, strip_types):
                 strip_id += 1
+                
+                
                 #skip the strip if the strip_type is "signal_quality_example" (there are no labelled beat positions)
-                if strip_type in {"signal_quality_example", "patient_event"}:
-                    continue
+                #if strip_type in {"signal_quality_example", "patient_event"}:
+                #    continue
 
                 usable_channels, _ = return_good_ecg_channel_idx_based_on_lead_off(ecg_strip, lead_off_list, 3)
                 resampled_label = self.resample_label(np.array([int((beat_position - start_time)*256/1000) for beat_position in label_strip]), fs, fs_resampling)
                 for idx in usable_channels:
+                    
+                    
+                    
                     #reject strips that have amplitude range more than 5000mV or less than 80mV
-                    range = np.ptp(ecg_strip[idx])
-                    if range > 5000 or range < 80:
-                        continue
+                    #range = np.ptp(ecg_strip[idx])
+                    #if range > 5000 or range < 80:
+                    #    continue
 
                     ecg_resampled.append(self.resample_ecg(ecg_strip[idx], fs, fs_resampling)) #use each channel of ecg one at a time
                     label_resampled.append(resampled_label)
