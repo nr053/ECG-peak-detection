@@ -16,10 +16,9 @@ fs_resampling = 360
 duration = 0.15 # 150ms
 
 class EDF_loading:
-    def __init__(self):
+    def __init__(self, path_to_data):
         # path definition
-        path_base = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
-        self.path_database = '/home/rose/Cortrium/ECG-peak-detection/'
+        self.path_database = path_to_data
  
 
     ### filtering method
@@ -126,7 +125,7 @@ class EDF_loading:
         # load data
 
         record = mne.io.read_raw_edf(file)
-        ecg = record.get_data()
+        ecg = record.get_data()[:3,:]
         fs = record.info["sfreq"]
 
         # load annotation
