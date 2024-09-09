@@ -10,6 +10,7 @@ from utils.db_generator import *
 from utils.localizer import *
 from utils.db_loader import DB_loading
 from utils.VAF_loader import VAF_loading
+from utils.edf_loader import EDF_loading
 
 path_utils = os.path.dirname(os.path.abspath(__file__))
 path_base = '/'.join(path_utils.split("/")[:-1])
@@ -19,15 +20,31 @@ atrous_rate = [1,3,6,9]
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 class Evaluator:
-    def __init__(self, model_name = 'trained_model.pt'):
-        #self.db_loading = DB_loading()
-        self.db_loading = VAF_loading()
+    def __init__(self, data, model_name = 'trained_model.pt'):
+        self.test_databases = [
+                        'MIT_BIH',
+                        'INCART',
+                        'QTDB',
+                        'MIT_BIH_ST',
+                        'European_ST_T',
+                        'TELE'
+                    ]
+        if data in self.test_databases:
+            self.db_loading = DB_loading()
+        elif data == "VAF":
+            self.db_loading = VAF_loading('/home/rose/Cortrium/10K_VAF_subset/VAF_subset/')
+        elif data == "EDF":
+            self.db_loading = EDF_loading('/home/rose/Cortrium/ECG-peak-detection/database/EDF/')
+        else:
+            self.db_loading = VAF_loading(data)
         self.model_name = model_name
 
     def load(self, name_database):
-        #self.name_database = name_database
-        #self.set_dict = self.db_loading.create_set(self.name_database)
-        self.set_dict = self.db_loading.create_set()
+        if name_database in self.test_databases:
+            self.name_database = name_database
+            self.set_dict = self.db_loading.create_set(self.name_database)
+        else:
+            self.set_dict = self.db_loading.create_set()
         self.test_loader = Test_Generator(self.set_dict)
         self.test_loader.list_label = self.set_dict['label']
         self.test_loader.list_mask_array = self.set_dict['mask_array']
@@ -37,6 +54,7 @@ class Evaluator:
         self.set_dict['pred_TP'] = []
         self.set_dict['pred_FP'] = []
         self.set_dict['pred_FN'] = []
+        self.set_dict['pred_position'] = []
 
     def statistics(self, TP=None, FP=None, FN=None):
         try:
@@ -74,6 +92,7 @@ class Evaluator:
                 self.set_dict['pred_TP'].append(localizer.list_TP_peak)
                 self.set_dict['pred_FP'].append(localizer.list_FP_peak)
                 self.set_dict['pred_FN'].append(localizer.list_FN_peak)
+                self.set_dict['pred_position'].append(localizer.list_peak)
                 del feature, target, output
                 torch.cuda.empty_cache()
 
