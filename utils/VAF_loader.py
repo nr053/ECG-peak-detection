@@ -135,6 +135,9 @@ class VAF_loading:
         start_times = vaf["strip_start_ms"]
         lead_off = vaf["lead_off"]
         strip_type = vaf["strip_type"]
+        strip_length = vaf["strip_length"]
+
+
         mask = np.array([])
 
         #remember the vaf is a dictionary containings lists of strip data. So ECG is a list of ECG strips, label is a list of beat positions lists. 
@@ -142,7 +145,7 @@ class VAF_loading:
         return ecg, label, start_times, fs, lead_off, strip_type, mask
 
     # pipeline
-    def create_set(self, use_swt=True): 
+    def create_set(self, use_swt=True, train=False): 
 
         file_names = glob.glob(self.path_database + '**/*.pkl', recursive=True)
         self.metadata_patient = [name.split("/")[-1] for name in file_names]
@@ -156,9 +159,32 @@ class VAF_loading:
         set_dict['feature'] = []
         set_dict['target'] = []
         set_dict['mask_array'] = []
+        #metadata
+        set_dict['strip_type'] = []
+        #set_dict['strip_length'] = []
+        set_dict['strip_position'] = []
+        set_dict['beat_annotation'] = []
+        #set_dict['signal_quality_level'] = []
 
         for file in tqdm(file_names):
-            ecg, label, start_times, fs, lead_off, strip_types, mask = self.load_data(file)
+            
+            with open(file, 'rb') as f:
+                vaf = pickle.load(f)
+        
+            #input data
+            ecg = vaf["strip_ecg"]
+            fs = 256 #Hz
+            label = vaf["beat_positions"]
+            start_times = vaf["strip_start_ms"]
+            lead_off = vaf["lead_off"]
+            mask = np.array([])
+            #meta data
+            strip_types = vaf["strip_type"]
+            #strip_lengths = vaf["strip_length"]
+            strip_positions = vaf["strip_position"]
+            beat_annotations = vaf["beat_annotations"]
+            #signal_quality_levels = vaf["signal_quality_level"]
+            
             
             ecg_resampled = []
             filenames = []
@@ -168,18 +194,27 @@ class VAF_loading:
             masks_array = []
             strip_ids = []
             channel_ids = []
+
+
             
             #print(file)
             #keep track of strip ID
             strip_id = 0
 
-            for ecg_strip, lead_off_list, label_strip, start_time, strip_type in zip(ecg, lead_off, label, start_times, strip_types):
+            zip_list = zip(ecg, label, start_times, lead_off, strip_types)
+
+            for ecg_strip, label_strip, start_time, lead_off_list, strip_type in zip_list:
                 strip_id += 1
                 
                 
                 #skip the strip if the strip_type is "signal_quality_example" (there are no labelled beat positions)
                 #if strip_type in {"signal_quality_example", "patient_event"}:
                 #    continue
+
+                #drop strips that are not 7seconds
+                #if ecg_strip.shape[1] != 1792:
+                #    continue
+                
 
                 usable_channels, _ = return_good_ecg_channel_idx_based_on_lead_off(ecg_strip, lead_off_list, 3)
                 resampled_label = self.resample_label(np.array([int((beat_position - start_time)*256/1000) for beat_position in label_strip]), fs, fs_resampling)
@@ -197,6 +232,7 @@ class VAF_loading:
                     filenames.append(file)
                     strip_ids.append(strip_id)
                     channel_ids.append(idx)
+
             mask = self.resample_label(mask, fs, fs_resampling)
 
             for strip in ecg_resampled:
@@ -213,7 +249,24 @@ class VAF_loading:
                 
                 masks_array.append(mask_array)
 
-            for ecg, label, feature, target, mask_array, filename, strip_id, channel_id in zip(ecg_resampled, label_resampled, features, targets, masks_array, filenames, strip_ids, channel_ids):
+            
+            zip_info = zip(
+                ecg_resampled, 
+                label_resampled, 
+                features, 
+                targets, 
+                masks_array, 
+                filenames, 
+                strip_ids, 
+                channel_ids,
+                strip_types,
+                #strip_lengths,
+                strip_positions,
+                beat_annotations,
+                #signal_quality_levels
+                )
+            
+            for ecg, label, feature, target, mask_array, filename, strip_id, channel_id, strip_type, strip_position, beat_annotation in zip_info:
 
                 set_dict['ecg'].append(ecg)
                 set_dict['label'].append(label)
@@ -223,7 +276,17 @@ class VAF_loading:
                 set_dict['filename'].append(filename)
                 set_dict['strip_id'].append(strip_id)
                 set_dict['channel_id'].append(channel_id)
+                #metadata
+                set_dict['strip_type'].append(strip_type)
+                #set_dict['strip_length'].append(strip_length)
+                set_dict['strip_position'].append(strip_position)
+                set_dict['beat_annotation'].append(beat_annotation)
+                #set_dict['signal_quality_level'].append(signal_quality_level)
 
+
+        if train == True:
+            set_dict = pd.DataFrame.from_dict(set_dict)
+        
         return set_dict
 
 
