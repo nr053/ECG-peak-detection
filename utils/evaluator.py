@@ -18,6 +18,7 @@ path_base = '/'.join(path_utils.split("/")[:-1])
 n_channel = 2
 atrous_rate = [1,3,6,9]
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
+#device = 'cpu'
 
 class Evaluator:
     def __init__(self, data, model_name = 'trained_model.pt'):
