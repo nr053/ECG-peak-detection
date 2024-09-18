@@ -18,10 +18,11 @@ Robust R-peak detection in an electrocardiogram with stationary wavelet transfor
 ### Alternative use (input: numpy array)
 Use in another script:
 ````
-   - from utils.evaluator import Evaluator
-   detector = Evaluator(numpy_array)
-   detector.load(numpy_array)
-   peaks = detector.find_peaks()
+from utils.evaluator import Evaluator
+
+detector = Evaluator(numpy_array)
+detector.load(numpy_array)
+peaks = detector.find_peaks()
 ````
 ### Arguments:
 ```
