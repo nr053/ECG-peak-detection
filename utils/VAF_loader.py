@@ -197,7 +197,7 @@ class VAF_loading:
 
 
             
-            #print(file)
+            #print(file) n
             #keep track of strip ID
             strip_id = 0
 
