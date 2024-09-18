@@ -1,6 +1,7 @@
 import pandas as pd
 import torch
 import os
+import numpy as np
 
 # import sep_conv
 # import db_generator
@@ -10,7 +11,8 @@ from utils.db_generator import *
 from utils.localizer import *
 from utils.db_loader import DB_loading
 from utils.VAF_loader import VAF_loading
-from utils.edf_loader import EDF_loading
+from utils.EDF_loader import EDF_loading
+from utils.NP_loader import NP_loading
 
 path_utils = os.path.dirname(os.path.abspath(__file__))
 path_base = '/'.join(path_utils.split("/")[:-1])
@@ -29,18 +31,23 @@ class Evaluator:
                         'European_ST_T',
                         'TELE'
                     ]
-        if data in self.test_databases:
-            self.db_loading = DB_loading()
-        elif data == "VAF":
-            self.db_loading = VAF_loading('/home/rose/Cortrium/10K_VAF_subset/VAF_subset/')
-        elif data == "EDF":
-            self.db_loading = EDF_loading('/home/rose/Cortrium/ECG-peak-detection/database/EDF/')
-        else:
-            self.db_loading = VAF_loading(data)
+        if isinstance(data, str):
+            if data in self.test_databases:
+                self.db_loading = DB_loading()
+            elif data == "VAF":
+                self.db_loading = VAF_loading('/home/rose/Cortrium/10K_VAF_subset/VAF_subset/')
+            elif data == "EDF":
+                self.db_loading = EDF_loading('/home/rose/Cortrium/ECG-peak-detection/database/EDF/')
+            else:
+                self.db_loading = VAF_loading(data)
+        elif type(data).__module__ == np.__name__:
+            self.db_loading = NP_loading(data)
+
         self.model_name = model_name
 
+
     def load(self, name_database):
-        if name_database in self.test_databases:
+        if isinstance(name_database, str) and name_database in self.test_databases:
             self.name_database = name_database
             self.set_dict = self.db_loading.create_set(self.name_database)
         else:
@@ -95,6 +102,8 @@ class Evaluator:
                 self.set_dict['pred_position'].append(localizer.list_peak)
                 del feature, target, output
                 torch.cuda.empty_cache()
+
+        return self.set_dict['pred_position']
 
     def report_summary(self):
         all_TP = sum([len(x) for x in self.set_dict['pred_TP']])
