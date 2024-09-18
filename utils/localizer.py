@@ -19,11 +19,20 @@ class Localizer:
 
     def find_peak(self):
         c_pred = np.convolve(self.pred, np.ones(self.t_window)/self.t_window, mode='same')
+        print(f"c_pred: {c_pred}")
+        print(f"c_pred shape: {c_pred.shape}")
         binary = np.where(c_pred > 0.5, c_pred, 0)
+        print(f"binary: {binary}")
+        print(f"binary shape: {binary.shape}")
+        print(f"binary max: {binary.max()}")
         list_peak, _ = signal.find_peaks(binary, height=0.5, distance=self.t_refractory)
-        list_peak = list_peak.astype('int')
-        list_peak = list_peak[list_peak < self.mask_array.shape[0]]
-        self.list_peak = list_peak[self.mask_array[list_peak] != 1]
+        print(f"list peak: {list_peak}")
+        self.list_peak = list_peak.astype('int')
+        #print(f"list peak int: {list_peak}")
+        #list_peak = list_peak[list_peak < self.mask_array.shape[0]]
+        #print(f"list peak 2: {list_peak}")
+        #self.list_peak = list_peak[self.mask_array[list_peak] != 1]
+        #print(f"list peak 3: {list_peak}")
 
     def evaluation(self):
         s = self.t_margin
