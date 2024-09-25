@@ -1,6 +1,7 @@
 import pickle
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
+
 from utils.helper_functions import return_good_ecg_channel_idx_based_on_lead_off
 import mne
 import numpy as np
@@ -20,6 +21,8 @@ from utils.db_generator import Train_Generator
 with open("/home/rose/Cortrium/R-peak-detector/VAF_subset/test/00a4aad0-5d1b-4456-a6f0-8e5c13d0feda.pkl", 'rb') as file:
     vaf = pickle.load(file)
 
+
+from utils.evaluator import Evaluator
 
 #edf
 #raw = mne.io.read_raw_edf("/home/rose/Cortrium/ECG-peak-detection/edf1.edf", preload=True)
