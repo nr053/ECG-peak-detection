@@ -208,8 +208,8 @@ class VAF_loading:
                 
                 
                 #skip the strip if the strip_type is "signal_quality_example" (there are no labelled beat positions)
-                #if strip_type in {"signal_quality_example", "patient_event"}:
-                #    continue
+                if strip_type in {"signal_quality_example", "patient_event"}:
+                    continue
 
                 #drop strips that are not 7seconds
                 #if ecg_strip.shape[1] != 1792:
@@ -223,9 +223,9 @@ class VAF_loading:
                     
                     
                     #reject strips that have amplitude range more than 5000mV or less than 80mV
-                    #range = np.ptp(ecg_strip[idx])
-                    #if range > 5000 or range < 80:
-                    #    continue
+                    range = np.ptp(ecg_strip[idx])
+                    if range > 5000 or range < 80:
+                        continue
 
                     ecg_resampled.append(self.resample_ecg(ecg_strip[idx], fs, fs_resampling)) #use each channel of ecg one at a time
                     label_resampled.append(resampled_label)
