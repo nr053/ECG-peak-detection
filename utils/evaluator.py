@@ -1,4 +1,4 @@
- import pandas as pd
+import pandas as pd
 import torch
 import os
 import numpy as np
@@ -13,16 +13,21 @@ from utils.db_loader import DB_loading
 from utils.VAF_loader import VAF_loading
 from utils.EDF_loader import EDF_loading
 from utils.NP_loader import NP_loading
+import yaml
 
-path_utils = os.path.dirname(os.path.abspath(__file__))
-path_base = '/'.join(path_utils.split("/")[:-1])
+#config
+with open("config.yaml") as f:
+    cfg = yaml.load(f, Loader=yaml.FullLoader)
 
-n_channel = 2
-atrous_rate = [1,3,6,9]
+path_base = cfg['path_to_repository']
+data_path = cfg['path_to_data']
+n_channel = cfg['n_channel']
+atrous_rate = cfg['atrous_rate']
+
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 class Evaluator:
-    def __init__(self, data, model_name = 'trained_model.pt'):
+    def __init__(self, data, model_name):
         self.test_databases = [
                         'MIT_BIH',
                         'INCART',
@@ -35,9 +40,9 @@ class Evaluator:
             if data in self.test_databases:
                 self.db_loading = DB_loading()
             elif data == "VAF":
-                self.db_loading = VAF_loading('/home/rose/Cortrium/10K_VAF_subset/VAF_subset/')
+                self.db_loading = VAF_loading(data_path + '10K_VAF_subset/VAF_subset/')
             elif data == "EDF":
-                self.db_loading = EDF_loading('/home/rose/Cortrium/ECG-peak-detection/database/EDF/')
+                self.db_loading = EDF_loading(data_path + 'EDF/')
             else:
                 self.db_loading = VAF_loading(data)
         elif type(data).__module__ == np.__name__:
@@ -55,7 +60,7 @@ class Evaluator:
         self.test_loader = Test_Generator(self.set_dict)
         self.test_loader.list_label = self.set_dict['label']
         self.test_loader.list_mask_array = self.set_dict['mask_array']
-        self.model_path = path_base + '/model/' + self.model_name
+        self.model_path = path_base + 'model/' + self.model_name
 
         self.set_dict['pred'] = []
         self.set_dict['pred_TP'] = []
