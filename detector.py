@@ -24,7 +24,7 @@ If you test these databases, you will see the performance in the training set.
 Cross-database testing is available when you test MIT_BIH_ST, European_ST_T, and TELE databases.
 '''
 
-peak_detector = Evaluator(database)
+peak_detector = Evaluator(data=database, model_name='self_trained_model.pt')
 
 ### Run peak detection pipeline
 print('Database ... {0}'.format(database))
