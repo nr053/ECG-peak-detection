@@ -1,11 +1,16 @@
 import numpy as np
 from scipy import signal
+import yaml
 
-fs_resampling = 360
-down_ratio = 2**5
-window = 0.075 # 75ms
-margin = 0.15 # 150ms
-refractory = 0.2 # 200ms
+#config
+with open("config.yaml") as f:
+    cfg = yaml.load(f, Loader=yaml.FullLoader)
+
+fs_resampling = cfg['fs_resampling']
+down_ratio = cfg['down_ratio'] # 2**5
+window = cfg['window'] # 75ms
+margin = cfg['margin'] # 150ms
+refractory = cfg['refractory'] # 200ms
 
 class Localizer:
     def __init__(self, label, pred, mask_array, conv_window=window):
@@ -19,20 +24,11 @@ class Localizer:
 
     def find_peak(self):
         c_pred = np.convolve(self.pred, np.ones(self.t_window)/self.t_window, mode='same')
-        print(f"c_pred: {c_pred}")
-        print(f"c_pred shape: {c_pred.shape}")
         binary = np.where(c_pred > 0.5, c_pred, 0)
-        print(f"binary: {binary}")
-        print(f"binary shape: {binary.shape}")
-        print(f"binary max: {binary.max()}")
         list_peak, _ = signal.find_peaks(binary, height=0.5, distance=self.t_refractory)
-        print(f"list peak: {list_peak}")
-        self.list_peak = list_peak.astype('int')
-        #print(f"list peak int: {list_peak}")
-        #list_peak = list_peak[list_peak < self.mask_array.shape[0]]
-        #print(f"list peak 2: {list_peak}")
-        #self.list_peak = list_peak[self.mask_array[list_peak] != 1]
-        #print(f"list peak 3: {list_peak}")
+        list_peak = list_peak.astype('int')
+        list_peak = list_peak[list_peak < self.mask_array.shape[0]]
+        self.list_peak = list_peak[self.mask_array[list_peak] != 1]
 
     def evaluation(self):
         s = self.t_margin
