@@ -159,12 +159,7 @@ class VAF_loading:
         set_dict['feature'] = []
         set_dict['target'] = []
         set_dict['mask_array'] = []
-        #metadata
-        set_dict['strip_type'] = []
-        #set_dict['strip_length'] = []
-        set_dict['strip_position'] = []
-        set_dict['beat_annotation'] = []
-        #set_dict['signal_quality_level'] = []
+
 
         for file in tqdm(file_names):
             
@@ -177,13 +172,9 @@ class VAF_loading:
             label = vaf["beat_positions"]
             start_times = vaf["strip_start_ms"]
             lead_off = vaf["lead_off"]
-            mask = np.array([])
-            #meta data
             strip_types = vaf["strip_type"]
-            #strip_lengths = vaf["strip_length"]
-            strip_positions = vaf["strip_position"]
-            beat_annotations = vaf["beat_annotations"]
-            #signal_quality_levels = vaf["signal_quality_level"]
+            mask = np.array([])
+
             
             
             ecg_resampled = []
@@ -258,15 +249,10 @@ class VAF_loading:
                 masks_array, 
                 filenames, 
                 strip_ids, 
-                channel_ids,
-                strip_types,
-                #strip_lengths,
-                strip_positions,
-                beat_annotations,
-                #signal_quality_levels
+                channel_ids
                 )
             
-            for ecg, label, feature, target, mask_array, filename, strip_id, channel_id, strip_type, strip_position, beat_annotation in zip_info:
+            for ecg, label, feature, target, mask_array, filename, strip_id, channel_id in zip_info:
 
                 set_dict['ecg'].append(ecg)
                 set_dict['label'].append(label)
@@ -276,12 +262,7 @@ class VAF_loading:
                 set_dict['filename'].append(filename)
                 set_dict['strip_id'].append(strip_id)
                 set_dict['channel_id'].append(channel_id)
-                #metadata
-                set_dict['strip_type'].append(strip_type)
-                #set_dict['strip_length'].append(strip_length)
-                set_dict['strip_position'].append(strip_position)
-                set_dict['beat_annotation'].append(beat_annotation)
-                #set_dict['signal_quality_level'].append(signal_quality_level)
+
 
 
         if train == True:
