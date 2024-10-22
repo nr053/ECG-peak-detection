@@ -11,12 +11,19 @@ from utils.helper_functions import return_good_ecg_channel_idx_based_on_lead_off
 import matplotlib.pyplot as plt
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
+import yaml
+
+#config
+with open("config.yaml") as f:
+    cfg = yaml.load(f, Loader=yaml.FullLoader)
+
+n_channel = cfg['n_channel']
+atrous_rate = cfg['atrous_rate']
+target_lv = cfg['target_level']
+fs_resampling = cfg['fs_resampling']
+duration = cfg['label_window_duration'] 
 
 
-target_lv = 4
-#target_lv = 1
-fs_resampling = 360
-duration = 0.15 # 150ms
 
 class VAF_loading:
     def __init__(self, path_to_data):
@@ -259,15 +266,13 @@ class VAF_loading:
                 set_dict['feature'].append(feature)
                 set_dict['target'].append(target)
                 set_dict['mask_array'].append(mask_array)
-                set_dict['filename'].append(filename)
-                set_dict['strip_id'].append(strip_id)
-                set_dict['channel_id'].append(channel_id)
 
+                if not train:
+                    #include metadata
+                    set_dict['filename'].append(filename)
+                    set_dict['strip_id'].append(strip_id)
+                    set_dict['channel_id'].append(channel_id)
 
-
-        if train == True:
-            set_dict = pd.DataFrame.from_dict(set_dict)
-        
         return set_dict
 
 
