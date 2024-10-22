@@ -12,11 +12,12 @@ parser = argparse.ArgumentParser(
                         description="find the positions of R-peaks in a collection of ECG samples"
 )
 parser.add_argument("database", help="path to data or selected database name (MIT-BIH, INCART, QTDB, etc.)")
+parser.add_argument("model", help="trained model weights to use, stored in .pt file")
 parser.add_argument("-v", "--visualise", help="visualise examples of poor performance", action='store_true')
 args = parser.parse_args()
 
 database = args.database
-
+model_name = args.model
 
 '''
 The current model was developed by training MIT_BIH, INCART, and QT databases.
@@ -24,7 +25,7 @@ If you test these databases, you will see the performance in the training set.
 Cross-database testing is available when you test MIT_BIH_ST, European_ST_T, and TELE databases.
 '''
 
-peak_detector = Evaluator(data=database, model_name='self_trained_model.pt')
+peak_detector = Evaluator(data=database, model_name=model_name)
 
 ### Run peak detection pipeline
 print('Database ... {0}'.format(database))
@@ -46,9 +47,9 @@ table_summary = table_summary.round(decimals=4)
 print('Summary of model performance')
 print(table_summary)
 
-table_summary.to_csv("table_summary.csv")
-dict = pd.DataFrame.from_dict(peak_detector.set_dict)
-dict.to_csv("set_dict.csv")
+#table_summary.to_csv("table_summary.csv")
+#dict = pd.DataFrame.from_dict(peak_detector.set_dict)
+#dict.to_csv("set_dict.csv")
 
 ### Visualize a specific ECGs
 # t_idx = 0
@@ -78,3 +79,4 @@ if args.visualise:
         if idx == len(peak_detector.set_dict["ecg"]):
             continue
         peak_detector.db_loading.visualise(peak_detector.set_dict, idx)
+
