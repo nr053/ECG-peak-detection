@@ -16,7 +16,7 @@ fs_resampling = cfg['fs_resampling']
 duration = cfg['label_window_duration'] # 150ms
 repo_path = cfg['path_to_repository']
 data_path = cfg['path_to_data']
-window_size = cfg['input_window_size'] #360 Hz * 7s = 2520
+window_size = cfg['feature_shape'] #360 Hz * 5.69s = 2048
 
 class DB_loading:
     def __init__(self):
@@ -90,7 +90,9 @@ class DB_loading:
         if use_swt == False:
             diff = np.diff(array, append=array[-1])
             diff = self.normalization(diff)
-            feature = diff.reshape(-1, 1)
+
+            array_norm = self.normalization(array)
+            feature = np.stack([array_norm, diff], axis=1)
             return feature
         else:
             feature = self.sw_transform(array)
