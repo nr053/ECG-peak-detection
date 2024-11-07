@@ -93,19 +93,6 @@ class Train():
                 loss = loss_fn(prediction.cuda(), target.cuda())
                 train_loss_batch.append(loss.item())
 
-                #visualise before back prop
-                # model.eval()
-                # if epoch_number == 1 and i == 0:
-                #     fig, axs = plt.subplots(3)
-                #     fig.title("Training")
-                #     axs[0].plot(prediction[0,-1].cpu().detach())
-                #     axs[0].set_title("Prediction")
-                #     axs[1].plot(torch.sigmoid(prediction[0,-1].cpu().detach()))
-                #     axs[1].set_title("sigmoid")
-                #     axs[2].plot(target[0,-1].cpu().detach())
-                #     axs[2].set_title("Target")
-                #     plt.savefig("foo_untrained.png")
-                #     plt.close()
                 model.train()
 
                 #backpropogation
@@ -114,14 +101,6 @@ class Train():
                 optimiser.step()
             
             train_loss_epoch.append(mean(train_loss_batch))
-
-            # #plot an example from the training set to show progression throughout training
-            # fig, axs = plt.subplots(3)
-            # axs[0].plot(prediction[0,-1].cpu().detach())
-            # axs[1].plot(torch.sigmoid(prediction[0,-1].cpu().detach()))
-            # axs[2].plot(target[0,-1].cpu().detach())
-            # plt.savefig("foo_training.png")
-            # plt.close()
 
             #evaluation section
             print("Validation Loop")
@@ -135,14 +114,6 @@ class Train():
                     loss = loss_fn(prediction.cuda(), target.cuda())
                     test_loss_batch.append(loss.item())
             test_loss_epoch.append(mean(test_loss_batch))
-
-            # #plot an example from the training set to show progression throughout training
-            # fig, axs = plt.subplots(3)
-            # axs[0].plot(prediction[0,-1].cpu().detach())
-            # axs[1].plot(torch.sigmoid(prediction[0,-1].cpu().detach()))
-            # axs[2].plot(target[0,-1].cpu().detach())
-            # plt.savefig("foo_validation.png")
-            # plt.close()
 
             #plot loss every 100 epochs
             if epoch_number % 10 == 0:
