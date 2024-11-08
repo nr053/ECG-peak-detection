@@ -35,7 +35,7 @@ Flag           Note                                                             
 ```
 ### Example usage:
 ```
-```` python detector.py MIT_BIH_ST self_trained_model.pt -v ````
+python detector.py MIT_BIH_ST self_trained_model.pt -v 
 ```
 ### Output
 A dataframe containing the inputs and outputs from the model are saved in "set_dict.csv". 
