@@ -74,7 +74,7 @@ dict.to_csv("set_dict.csv")
 # plt.title('Database {}, Patient {}'.format(test_database, t_patient))
 # plt.xlabel('Time (s)')
 # plt.ylabel('Voltage (mV)')
-# plt.savefig('/home/rose/Cortrium/ECG-peak-detection/results.png')
+# plt.savefig(path_to_data + '/ECG-peak-detection/results.png')
 
 
 
