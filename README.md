@@ -12,6 +12,7 @@ Robust R-peak detection in an electrocardiogram with stationary wavelet transfor
 - ```` pip install -r requirements.txt ````
 
 ## How to use
+- update config (instructions at the bottom)
 - activate venv
 - ```` python detector.py <DATABASE> <MODEL><optional arguments> ````
 
@@ -92,6 +93,16 @@ database
 ├─ ...
 └─ TELE
 ```
+
+## Config
+The project configuration is stored in the ````config.yaml````file. All model parameters and training parameters are defined here. The datapath config MUST be updated to run the ```detector.py```script without updating all data and evaluation classes individually. E.g.
+
+````
+#repo config
+path_to_data: /PATH/TO/YOUR/DATABASE/FOLDER/
+path_to_repository: /PATH/TO/YOUR/LOCAL/REPOSITORY/
+````
+
 
 ## Peak detection
 You can see peak detection codes in 'detector.py' and 'detector.ipynb' files. Note that the model was trained by MIT_BIH, INCART, and QT databases and you can see cross-database performance when you test MIT_BIH_ST, European_ST_T, and TELE databases.
