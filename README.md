@@ -37,6 +37,29 @@ Flag           Note                                                             
 ```
 python detector.py MIT_BIH_ST self_trained_model.pt -v 
 ```
+All data classes are equipped with a visualisation method, useful for examining both model input and output. This method can be called from the detector.py script using
+```
+peak_detector.db_loading.visualise(peak_detector.set_dict, idx)
+```
+where ````idx```` is the index of the sample to be visualised. The figure is saved as a png and html file in the structure outlined below
+
+
+```
+repository
+├─ ...
+├─ figures
+   ├─ edf
+   ├─ publicDBs
+      ├─ html
+         ├─ idx.html
+      ├─ png
+         ├─ idx.png
+   ├─ training
+├─ ...
+
+
+```
+
 ### Output
 A dataframe containing the inputs and outputs from the model are saved in "set_dict.csv". 
 The "ecg" column contains the raw ECG data, the "label" column contains the ground truth index of beat positions and the
