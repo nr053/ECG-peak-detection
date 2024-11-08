@@ -40,7 +40,7 @@ class Evaluator:
             if data in self.test_databases:
                 self.db_loading = DB_loading()
             elif data == "VAF":
-                self.db_loading = VAF_loading(data_path + '10K_VAF_subset/VAF_subset/')
+                self.db_loading = VAF_loading(data_path + '10K_VAF_subset/VAF_subset/test/')
             elif data == "EDF":
                 self.db_loading = EDF_loading(data_path + 'EDF/')
             else:
@@ -51,12 +51,12 @@ class Evaluator:
         self.model_name = model_name
 
 
-    def load(self, name_database):
+    def load(self, name_database, use_swt):
         if isinstance(name_database, str) and name_database in self.test_databases:
             self.name_database = name_database
-            self.set_dict = self.db_loading.create_set(self.name_database)
+            self.set_dict = self.db_loading.create_set(self.name_database, use_swt=use_swt)
         else:
-            self.set_dict = self.db_loading.create_set()
+            self.set_dict = self.db_loading.create_set(use_swt=use_swt)
         self.test_loader = Test_Generator(self.set_dict)
         self.test_loader.list_label = self.set_dict['label']
         self.test_loader.list_mask_array = self.set_dict['mask_array']
@@ -86,7 +86,7 @@ class Evaluator:
     def find_peaks(self):
         torch.cuda.empty_cache()
         model = Sep_conv_detector(n_channel=n_channel, atrous_rate=atrous_rate).to(device)
-        model.load_state_dict(torch.load(self.model_path))
+        model.load_state_dict(torch.load(self.model_path, weights_only=True))
         model.eval()
 
         with torch.no_grad():
