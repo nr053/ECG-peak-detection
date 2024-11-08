@@ -13,7 +13,9 @@ Robust R-peak detection in an electrocardiogram with stationary wavelet transfor
 
 ## How to use
 - activate venv
-- ```` python detector.py <DATABASE> <optional arguments> ````
+- ```` python detector.py <DATABASE> <MODEL><optional arguments> ````
+
+The detector automatically detects whether to use SWT preprocessing from the model name.
 
 ### Alternative use (input: numpy array)
 Use in another script:
@@ -30,6 +32,10 @@ Flag           Note                                                             
 -h, --help     show this help message and exit                
 --database     A path to the directory containing VAF files or a string denoting the desired dataset option.            -      
 --visualise    optional tag to generate plots of examples with less than 50% sensitivity                              False                          
+```
+### Example usage:
+```
+```` python detector.py MIT_BIH_ST self_trained_model.pt -v ````
 ```
 ### Output
 A dataframe containing the inputs and outputs from the model are saved in "set_dict.csv". 
