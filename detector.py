@@ -52,9 +52,9 @@ table_summary = table_summary.round(decimals=4)
 print('Summary of model performance')
 print(table_summary)
 
-#table_summary.to_csv("table_summary.csv")
-#dict = pd.DataFrame.from_dict(peak_detector.set_dict)
-#dict.to_csv("set_dict.csv")
+table_summary.to_csv("table_summary.csv")
+dict = pd.DataFrame.from_dict(peak_detector.set_dict)
+dict.to_csv("set_dict.csv")
 
 ### Visualize a specific ECGs
 # t_idx = 0
