@@ -17,7 +17,6 @@ import matplotlib.pyplot as plt
 import random
 from sklearn.preprocessing import MinMaxScaler
 
-
 #config
 with open("config.yaml") as f:
     cfg = yaml.load(f, Loader=yaml.FullLoader)
