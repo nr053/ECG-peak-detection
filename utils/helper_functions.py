@@ -803,9 +803,3 @@ def AnnotationToBinaryForm(annotations_str, type_positive):
     
     return annotations_int
 
-
-import pickle
-
-with open("/home/rose/Cortrium/R-peak-detector/VAF_subset/test/00a11b43-d252-42b5-9a59-da1657919459.pkl", 'rb') as file:
-    vaf = pickle.load(file)
-

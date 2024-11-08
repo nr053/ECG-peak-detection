@@ -1,2 +1,19 @@
-path: /home/rose/Cortrium/
-n_channels: 2
+#repo config
+path_to_data: /home/rose/Cortrium/Databases/
+path_to_repository: /home/rose/Cortrium/ECG-peak-detection/
+#model parameters
+target_level: 4
+fs_resampling: 360
+label_window_duration: 0.15 #150ms
+input_window_size: 2520 #360Hz * 7s
+feature_shape: 2048
+n_channel: 2
+atrous_rate: [1,3,6,9]
+down_ratio: 32 #2**5
+window: 0.075 #75ms
+margin: 0.15 #150ms
+refractory: 0.2 #200ms
+#training parameters
+batch_size: 128
+learning_rate: 0.00001 #10e-6
+n_epochs: 200

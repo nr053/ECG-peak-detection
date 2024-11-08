@@ -4,17 +4,25 @@ import sys, os
 import pywt
 import wfdb
 from scipy import signal
+import yaml
+from plotly.subplots import make_subplots
+import plotly.graph_objects as go
 
-target_lv = 4
-fs_resampling = 360
-duration = 0.15 # 150ms
+with open("config.yaml") as f:
+    cfg = yaml.load(f, Loader=yaml.FullLoader)
+
+target_lv = cfg['target_level']
+fs_resampling = cfg['fs_resampling']
+duration = cfg['label_window_duration'] # 150ms
+repo_path = cfg['path_to_repository']
+data_path = cfg['path_to_data']
+window_size = cfg['feature_shape'] #360 Hz * 5.69s = 2048
 
 class DB_loading:
     def __init__(self):
         # path definition
-        path_base = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
-        self.path_database = path_base + '/database/'
-        self.report_table = pd.read_excel(path_base + '/ecg_databases.xlsx')
+        self.path_database = data_path
+        self.report_table = pd.read_excel(repo_path + 'ecg_databases.xlsx')
  
 
     ### filtering method
@@ -82,7 +90,9 @@ class DB_loading:
         if use_swt == False:
             diff = np.diff(array, append=array[-1])
             diff = self.normalization(diff)
-            feature = diff.reshape(-1, 1)
+
+            array_norm = self.normalization(array)
+            feature = np.stack([array_norm, diff], axis=1)
             return feature
         else:
             feature = self.sw_transform(array)
@@ -123,7 +133,7 @@ class DB_loading:
         database = self.report_table.loc[self.table_loc, 'Database']
         patient = self.report_table.loc[self.table_loc, 'Patient']
         num = self.report_table.loc[self.table_loc, 'Num']
-        path_file = self.path_database+database + '/physionet.org/files/mitdb/1.0.0/' + str(patient)
+        path_file = self.path_database + database + '/' + str(patient)
 
         if verbose == True:
             print('Database : {0}, Patient : {1}'.format(database, patient))
@@ -135,8 +145,7 @@ class DB_loading:
             fs = record[1]['fs']
 
             # load annotation
-            print(self.path_database+database+'/physionet.org/files/mitdb/1.0.0/'+str(patient), 'atr')
-            ann = wfdb.rdann(self.path_database+database+'/physionet.org/files/mitdb/1.0.0/'+str(patient), 'atr')
+            ann = wfdb.rdann(self.path_database + database + '/' + str(patient), 'atr')
             label = self.load_annotation(ann)
             mask = np.array([])
 
@@ -188,11 +197,9 @@ class DB_loading:
         return ecg, label, fs, mask
 
     # pipeline
-    def create_set(self, name_database, use_swt=True): 
+    def create_set(self, name_database, use_swt=True, train=False): 
         list_idx = self.return_idx(name_database)
         self.metadata_patient = self.report_table.loc[list_idx,:]['Patient'].tolist()
-
-        print(self.metadata_patient)
 
         set_dict = dict()
         set_dict['ecg'] = []
@@ -218,10 +225,75 @@ class DB_loading:
             mask_array += area_ignore
             mask_array = np.where(mask_array>0, 1, 0)
 
-            set_dict['ecg'].append(ecg)
-            set_dict['label'].append(label)
-            set_dict['feature'].append(feature)
-            set_dict['target'].append(target)
-            set_dict['mask_array'].append(mask_array)
+            if train:
+                #split ecg/feature/target into 7s windows
+                #re-index labels based on new short windows
+                ecg_windows = []
+                feature_windows = []
+                target_windows = []
+                mask_array_windows = []
+                label_windows = []
+
+                i = 0
+                while i <= ecg.shape[0] - window_size: #drop the last window if it is short
+                    ecg_windows.append(ecg[i:i+window_size])                
+                    feature_windows.append(feature[i:i+window_size])                
+                    target_windows.append(target[i:i+window_size])                
+                    mask_array_windows.append(mask_array[i:i+window_size])                
+                    label_windows.append([x % window_size for x in label if i <= x < i + window_size])
+                    i += window_size
+
+                zip_list = zip(ecg_windows, label_windows, feature_windows, target_windows, mask_array_windows)
+                for ecg, label, feature, target, mask_array in zip_list:
+                    set_dict['ecg'].append(ecg)
+                    set_dict['label'].append(label)
+                    set_dict['feature'].append(feature)
+                    set_dict['target'].append(target)
+                    set_dict['mask_array'].append(mask_array)
+
+            else:
+                set_dict['ecg'].append(ecg)
+                set_dict['label'].append(label)
+                set_dict['feature'].append(feature)
+                set_dict['target'].append(target)
+                set_dict['mask_array'].append(mask_array)
 
         return set_dict
+
+
+    def visualise(self, set_dict, idx):
+        ecg = set_dict["ecg"]
+        feature = set_dict["feature"]
+        target = set_dict["target"]
+        label = np.zeros(len(ecg[idx]))
+        for i in set_dict["label"][idx]: 
+            label[i] = 1
+        mask_array = set_dict["mask_array"]
+
+
+        fig = make_subplots(rows=5, cols=1, shared_xaxes=True)
+
+        fig.add_trace(
+            go.Scatter(y=ecg[idx], name=f"ECG"),
+            row=1, col=1
+        )
+        fig.add_trace(
+            go.Scatter(y=feature[idx][:,0], name="feature 1"),
+            row=2, col=1
+        )
+        fig.add_trace(
+            go.Scatter(y=feature[idx][:,1], name="feature 2"),
+            row=3, col=1
+        )
+        fig.add_trace(
+            go.Scatter(y=target[idx], name="target"),
+            row=4, col=1
+        )
+        fig.add_trace(
+            go.Scatter(y=label, name="label"),
+            row=5, col=1
+        )
+
+        fig.update_layout(title_text=f"file, strip, channel")
+        fig.write_image(f"figures/publicDBs/png/{idx}.png")
+        fig.write_html(f"figures/publicDBs/html/{idx}.html")

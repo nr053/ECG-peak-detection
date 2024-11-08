@@ -2,11 +2,16 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.utils.data as data
+import yaml
 
-n_channel = 2
-down_ratio = 2**5
-feature_shape = 2048
-atrous_rate = [1,3,6,9]
+#config
+with open("config.yaml") as f:
+    cfg = yaml.load(f, Loader=yaml.FullLoader)
+
+n_channel = cfg['n_channel']
+atrous_rate = cfg['atrous_rate']
+down_ratio = cfg['down_ratio']
+feature_shape = cfg['feature_shape']
 
 def padding_helper(inputs, n_kernel, n_dilation):
     n_kernel_valid = n_kernel + (n_kernel-1)*(n_dilation-1)
