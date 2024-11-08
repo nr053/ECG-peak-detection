@@ -19,6 +19,11 @@ args = parser.parse_args()
 database = args.database
 model_name = args.model
 
+if "no_swt" in model_name:
+     use_swt=False 
+else: 
+    use_swt=True
+
 '''
 The current model was developed by training MIT_BIH, INCART, and QT databases.
 If you test these databases, you will see the performance in the training set.
@@ -30,7 +35,7 @@ peak_detector = Evaluator(data=database, model_name=model_name)
 ### Run peak detection pipeline
 print('Database ... {0}'.format(database))
 start = time.time()
-peak_detector.load(database)
+peak_detector.load(database, use_swt=use_swt)
 peak_detector.find_peaks()
 end = time.time()
 elapsed = end-start
