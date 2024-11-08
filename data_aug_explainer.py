@@ -23,6 +23,8 @@ with open("config.yaml") as f:
 
 feature_shape = cfg['feature_shape']
 target_lv = cfg['target_level']
+path_to_repo = cfg['path_to_repo']
+path_to_data = cfg['path_to_data']
 
 ### filtering method
 def dwt_idwt(array, wavelet='db3', level=9):
@@ -102,27 +104,27 @@ def append_dicts(dict1, dict_list:[]):
     return dict1
 
 #vaf
-with open("/home/rose/Cortrium/Databases/10K_VAF_subset/VAF_subset/train/00a4aad0-5d1b-4456-a6f0-8e5c13d0feda.pkl", 'rb') as file:
+with open(path_to_data + "/10K_VAF_subset/VAF_subset/train/00a4aad0-5d1b-4456-a6f0-8e5c13d0feda.pkl", 'rb') as file:
     vaf = pickle.load(file)
 
 
 #edf
-#raw = mne.io.read_raw_edf("/home/rose/Cortrium/ECG-peak-detection/edf1.edf", preload=True)
+#raw = mne.io.read_raw_edf(path_to_data + "/EDF/edf1.edf", preload=True)
 #data = raw.get_data()
 
 
 # other files
-record = wfdb.rdsamp("/home/rose/Cortrium/Databases/MIT_BIH/100")
+record = wfdb.rdsamp(path_to_data + "/Databases/MIT_BIH/100")
 ecg = record[0][:, 1]
 fs = record[1]['fs']
 # load annotation
-ann = wfdb.rdann("/home/rose/Cortrium/Databases/MIT_BIH/100", 'atr')
+ann = wfdb.rdann(path_to_data + "/Databases/MIT_BIH/100", 'atr')
 
 
 # artifical noise
-record_bw = wfdb.rdsamp("/home/rose/Cortrium/Databases/MIT_BIH_NST/bw")
-record_ma = wfdb.rdsamp("/home/rose/Cortrium/Databases/MIT_BIH_NST/ma")
-record_em = wfdb.rdsamp("/home/rose/Cortrium/Databases/MIT_BIH_NST/em")
+record_bw = wfdb.rdsamp(path_to_data + "/Databases/MIT_BIH_NST/bw")
+record_ma = wfdb.rdsamp(path_to_data + "/Databases/MIT_BIH_NST/ma")
+record_em = wfdb.rdsamp(path_to_data + "/Databases/MIT_BIH_NST/em")
 
 
 bassline_wander = record_bw[0][:, 1] #use second channel only
