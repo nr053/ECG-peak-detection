@@ -19,8 +19,16 @@ with open("config.yaml") as f:
     cfg = yaml.load(f, Loader=yaml.FullLoader)
 
 path_to_data = cfg['path_to_data']
+path_to_repo = cfg['path_to_repo']
 
 class Train():
+    """
+    Training class 
+
+    Args: 
+        data_aug (bool): use data augmentation
+        use_swt (bool): use SWT preprocessing
+    """
     def __init__(self, data_aug:bool, use_swt:bool):
         #config
         with open("config.yaml") as f:
@@ -33,6 +41,13 @@ class Train():
             self.tag = self.tag + "_no_swt"
 
     def append_dicts(self, dict1, dict_list:[]):
+        """
+        Append a list of dictionaries to an existing dictionary
+        
+        Args:
+            dict1 (dict): existing dictionary
+            dict_list ([dict]): a list of dictionaries to append
+        """
         for dict in dict_list:    
             for key in dict:
                 for item in dict[key]:
@@ -41,6 +56,13 @@ class Train():
 
 
     def create_data(self, data_aug:bool, use_swt:bool):
+        """
+        Create training data from public databases INCART, MIT, QT and private Cortrium VAF library. 
+
+        Args:
+            data_aug (bool): use data augmentation
+            use_swt (bool): use_swt  
+        """
         #train data
         print("")
         print("Loading train data")
@@ -64,7 +86,12 @@ class Train():
 
 
     def training_loop(self):
+        """
+        Training loop to train the detector. 
 
+        Plot loss every 10 epochs to monitor training. 
+        Saves the best model based on training loss training. 
+        """
         #config
         device = 'cuda' if torch.cuda.is_available() else 'cpu'
         model = Sep_conv_detector(n_channel=self.cfg['n_channel'], atrous_rate=self.cfg['atrous_rate']).to(device)
@@ -115,7 +142,7 @@ class Train():
                     test_loss_batch.append(loss.item())
             test_loss_epoch.append(mean(test_loss_batch))
 
-            #plot loss every 100 epochs
+            #plot loss every 10 epochs
             if epoch_number % 10 == 0:
                 plt.figure()
                 plt.title(f"Loss at epoch: {epoch_number}")
@@ -128,10 +155,8 @@ class Train():
 
             #save model and epoch number at minimum loss
             if test_loss_epoch[-1] <= min(test_loss_epoch):
-                torch.save(model.state_dict(), "/home/rose/Cortrium/ECG-peak-detection/model/self_trained_model" + self.tag + ".pt")
+                torch.save(model.state_dict(), path to repo + "model/self_trained_model" + self.tag + ".pt")
                 best_epoch = epoch_number
-
-
 
         plt.figure()
         plt.title(f"Loss plot final. Best epoch: {best_epoch}")
@@ -140,6 +165,7 @@ class Train():
         plt.legend()
         plt.savefig("figures/training/loss_plot_final" + self.tag + ".png")
         plt.close()
+
 
     def visualise(self, idx):
         ecg = self.dict_train["ecg"]
