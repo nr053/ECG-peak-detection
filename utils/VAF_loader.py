@@ -22,8 +22,6 @@ target_lv = cfg['target_level']
 fs_resampling = cfg['fs_resampling']
 duration = cfg['label_window_duration'] 
 
-
-
 class VAF_loading(DB_loading):
     def __init__(self, path_to_data):
         self.path_database = path_to_data
@@ -41,10 +39,7 @@ class VAF_loading(DB_loading):
         lead_off = vaf["lead_off"]
         strip_type = vaf["strip_type"]
         #strip_length = vaf["strip_length"]
-
-
         mask = np.array([])
-
         #remember the vaf is a dictionary containings lists of strip data. So ECG is a list of ECG strips, label is a list of beat positions lists. 
 
         return ecg, label, start_times, fs, lead_off, strip_type, mask
@@ -65,7 +60,6 @@ class VAF_loading(DB_loading):
         set_dict['target'] = []
         set_dict['mask_array'] = []
 
-
         for file in tqdm(file_names):
             
             with open(file, 'rb') as f:
@@ -79,8 +73,6 @@ class VAF_loading(DB_loading):
             lead_off = vaf["lead_off"]
             strip_types = vaf["strip_type"]
             mask = np.array([])
-
-            
             
             ecg_resampled = []
             filenames = []
@@ -91,17 +83,11 @@ class VAF_loading(DB_loading):
             strip_ids = []
             channel_ids = []
 
-
-            
-            #print(file) n
             #keep track of strip ID
             strip_id = 0
-
             zip_list = zip(ecg, label, start_times, lead_off, strip_types)
-
             for ecg_strip, label_strip, start_time, lead_off_list, strip_type in zip_list:
                 strip_id += 1
-                
                 
                 #skip the strip if the strip_type is "signal_quality_example" (there are no labelled beat positions)
                 if strip_type in {"signal_quality_example", "patient_event"}:
@@ -111,13 +97,9 @@ class VAF_loading(DB_loading):
                 #if ecg_strip.shape[1] != 1792:
                 #    continue
                 
-
                 usable_channels, _ = return_good_ecg_channel_idx_based_on_lead_off(ecg_strip, lead_off_list, 3)
                 resampled_label = self.resample_label(np.array([int((beat_position - start_time)*256/1000) for beat_position in label_strip]), fs, fs_resampling)
                 for idx in usable_channels:
-                    
-                    
-                    
                     #reject strips that have amplitude range more than 5000mV or less than 80mV
                     range = np.ptp(ecg_strip[idx])
                     if range > 5000 or range < 80:
@@ -144,7 +126,6 @@ class VAF_loading(DB_loading):
                 mask_array = np.where(mask_array>0, 1, 0)
                 
                 masks_array.append(mask_array)
-
             
             zip_info = zip(
                 ecg_resampled, 
@@ -175,27 +156,14 @@ class VAF_loading(DB_loading):
 
 
     def visualise(self, set_dict, idx):
-    
-
-
         ecg = set_dict["ecg"]
         feature = set_dict["feature"]
         target = set_dict["target"]
         label = set_dict["label"]
         pred = set_dict["pred"]
-        
         filename = set_dict["filename"]
         strip_id = set_dict["strip_id"]
         channel_id = set_dict["channel_id"]
-
-
-        # fig, axs = plt.subplots(5, constrained_layout=True)
-        # #fig.tight_layout()
-        # axs[0].plot(ecg[idx])
-        # axs[1].plot(feature[idx][:,0])
-        # axs[2].plot(feature[idx][:,1])
-        # axs[3].plot(target[idx])
-        # axs[4].plot(pred[idx][:target[idx].shape[0]])
 
         file = filename[idx].split("/")[-1]
         strip_idx = strip_id[idx]-1
@@ -203,11 +171,6 @@ class VAF_loading(DB_loading):
         ecg_v, label_v, start_times_v, fs_v, lead_off_v, strip_type_v, mask_v = self.load_data(filename[idx])
         usable_channels, _ = return_good_ecg_channel_idx_based_on_lead_off(ecg_v[strip_idx], lead_off_v[strip_idx], 3)
         usable_channels.remove(channel_id[idx])
-
-        # fig.suptitle(f"{file}, strip: {strip_id[idx]}, channel: {channel_id[idx]} ", fontsize=8)
-        # plt.savefig(f"figures/foo_{file}_{strip_id[idx]}_{channel_id[idx]}.png")
-        # plt.close()
-        
 
         fig = make_subplots(rows=5+len(usable_channels), cols=1, shared_xaxes=True)
 
