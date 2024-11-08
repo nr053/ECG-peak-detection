@@ -19,12 +19,15 @@ data_path = cfg['path_to_data']
 window_size = cfg['feature_shape'] #360 Hz * 5.69s = 2048
 
 class DB_loading:
+    """
+    Parent class for databases loading. This class is used to load public databases and is the parent class 
+    for VAF and EDF loading.  
+    """
     def __init__(self):
         # path definition
         self.path_database = data_path
         self.report_table = pd.read_excel(repo_path + 'ecg_databases.xlsx')
  
-
     ### filtering method
     def dwt_idwt(self, array, wavelet='db3', level=9):
         coeffs = pywt.wavedec(array, wavelet, level=level)
@@ -198,6 +201,17 @@ class DB_loading:
 
     # pipeline
     def create_set(self, name_database, use_swt=True, train=False): 
+        """
+        Create set_dict for a given database
+
+        Args: 
+            name_database (str): name of database to use
+            use_swt (bool): whether to use SWT peak enhancement processing step
+            train (bool): whether to use training settings 
+
+        Returns: 
+            dict: dictionary of sample data     
+        """
         list_idx = self.return_idx(name_database)
         self.metadata_patient = self.report_table.loc[list_idx,:]['Patient'].tolist()
 
@@ -262,6 +276,13 @@ class DB_loading:
 
 
     def visualise(self, set_dict, idx):
+        """
+        Visualise a sample from the set dict
+
+        Args: 
+            set_dict (dict): set_dict created by create_set() function
+            idx (int): index of sample to be plotted
+        """
         ecg = set_dict["ecg"]
         feature = set_dict["feature"]
         target = set_dict["target"]
@@ -269,7 +290,6 @@ class DB_loading:
         for i in set_dict["label"][idx]: 
             label[i] = 1
         mask_array = set_dict["mask_array"]
-
 
         fig = make_subplots(rows=5, cols=1, shared_xaxes=True)
 

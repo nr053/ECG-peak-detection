@@ -18,6 +18,12 @@ fs_resampling = cfg["fs_resampling"]
 target_lv = cfg["target_level"]
 
 class Test_Loader(data.Dataset):
+    """
+    Data loading class for testing a trained peak detector.
+    
+    Args:
+        set_dict: (dict) database dictionary ouput from the create_set() method of a data class    
+    """
     def __init__(self, set_dict):
         self.list_feature = set_dict['feature']
         self.list_target = set_dict['target']
@@ -46,6 +52,13 @@ class Test_Loader(data.Dataset):
         return X, y
 
 class Train_Loader(data.Dataset):
+    """
+    Data loading class for training a peak detector.
+    
+    Args:
+        set_dict: (dict) database dictionary ouput from the create_set() method of a data class.
+        data_aug: (bool) whether augmentation should be used in the training process.
+    """
     def __init__(self, set_dict, data_aug):
         self.list_feature = set_dict['feature']
         self.list_target = set_dict['target']

@@ -23,6 +23,9 @@ fs_resampling = cfg['fs_resampling']
 duration = cfg['label_window_duration'] 
 
 class VAF_loading(DB_loading):
+    """
+    Data class for loading VAF data. 
+    """
     def __init__(self, path_to_data):
         self.path_database = path_to_data
 
@@ -46,7 +49,16 @@ class VAF_loading(DB_loading):
 
     # pipeline
     def create_set(self, use_swt=True, train=False): 
+        """
+        Create set_dict for VAF data
 
+        Args: 
+            use_swt (bool): whether to use SWT peak enhancement processing step
+            train (bool): whether to use training settings 
+
+        Returns: 
+            dict: dictionary of sample data 
+        """
         file_names = glob.glob(self.path_database + '**/*.pkl', recursive=True)
         self.metadata_patient = [name.split("/")[-1] for name in file_names]
 
@@ -156,6 +168,13 @@ class VAF_loading(DB_loading):
 
 
     def visualise(self, set_dict, idx):
+        """
+        Visualise a sample from the set dict
+
+        Args: 
+            set_dict (dict): set_dict created by create_set() function
+            idx (int): index of sample to be plotted
+        """
         ecg = set_dict["ecg"]
         feature = set_dict["feature"]
         target = set_dict["target"]

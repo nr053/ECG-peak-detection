@@ -24,10 +24,22 @@ fs_resampling = cfg['fs_resampling']
 duration = cfg['label_window_duration'] 
 
 class NP_loading(DB_loading):
+    """
+    Data class for loading numpy array. 
+    """
     def __init__(self, array):
         self.data = array
 
     def create_set(self, use_swt=True): 
+        """
+        Create set_dict for numpy data
+
+        Args: 
+            use_swt (bool): whether to use SWT peak enhancement processing step
+
+        Returns: 
+            dict: dictionary of sample data 
+        """
         ecg = self.data
         fs = 256 #Hz
 
@@ -54,6 +66,13 @@ class NP_loading(DB_loading):
 
 
     def visualise(self, set_dict, idx):
+        """
+        Visualise a sample from the set dict
+
+        Args: 
+            set_dict (dict): set_dict created by create_set() function
+            idx (int): index of sample to be plotted
+        """
         ecg = set_dict["ecg"]
         feature = set_dict["feature"]
         target = set_dict["target"]
