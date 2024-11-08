@@ -25,11 +25,8 @@ class EDF_loading(DB_loading):
         # path definition
         self.path_database = path_to_data
  
-
-
     def load_data(self, file, verbose=False):
         # load data
-
         record = mne.io.read_raw_edf(file)
         ecg = record.get_data()[:3,:]
         fs = record.info["sfreq"]
@@ -41,8 +38,7 @@ class EDF_loading(DB_loading):
         return ecg, label, fs, mask
 
     # pipeline
-    def create_set(self, use_swt=False): 
-
+    def create_set(self, use_swt): 
         filenames = glob.glob(self.path_database + '**/*.edf', recursive=True)
         self.metadata_patient = [name.split("/")[-1] for name in filenames]
 
@@ -58,7 +54,6 @@ class EDF_loading(DB_loading):
 
         for file in tqdm(filenames):
             ecg, label, fs, mask = self.load_data(file)
-
 
             hours_of_data = math.ceil(ecg.shape[1]/fs/3600) #calculate using original sampling freq
             time_frame = int(60*60*fs_resampling) #60 seconds * 60 minutes = 3600 seconds in one hour / 3600 seconds * 360 Hz = 1296000 datapoints (using resampling freq)
@@ -107,17 +102,13 @@ class EDF_loading(DB_loading):
                     set_dict['filename'].append(file.split("/")[-1])
                     set_dict['channel_id'].append(channel_id)
                     set_dict['hour_id'].append(hour_id)
-
                 channel_id +=1
-
-
 
         return set_dict
 
 
 
     def visualise(self, set_dict, idx):
-    
         ecg = set_dict["ecg"]
         feature = set_dict["feature"]
         pred = set_dict["pred"]
