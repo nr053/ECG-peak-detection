@@ -131,6 +131,15 @@ class DB_loading:
         return sorted_anno
 
     def load_data(self, order, verbose=False):
+        """
+        Procedure to handle a single file in one of the public databases. 
+
+        Returns: 
+            ecg (array): an array of ECG data 
+            label (array): label array denoting peak locations
+            fs (int): sampling frequency of ECG data
+            mask (array): mask array
+        """
         self.order = order
         self.table_loc = self.report_table[self.report_table.index == order].index[0]
         database = self.report_table.loc[self.table_loc, 'Database']

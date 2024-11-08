@@ -30,7 +30,17 @@ class VAF_loading(DB_loading):
         self.path_database = path_to_data
 
     def load_data(self, file):
-        
+        """
+        Procedure to handle a single file VAF file. 
+
+        Returns: 
+            ecg (list): list of ECG arrays 
+            label (list): list of arrays denoting peak positions
+            start_times (list): list of start times of VAF strips
+            fs (int): sampling frequency of ECG data
+            lead off (list): list of lead off values 
+            mask (array): mask array
+        """
         with open(file, 'rb') as f:
             vaf = pickle.load(f)
         
@@ -73,7 +83,6 @@ class VAF_loading(DB_loading):
         set_dict['mask_array'] = []
 
         for file in tqdm(file_names):
-            
             with open(file, 'rb') as f:
                 vaf = pickle.load(f)
         

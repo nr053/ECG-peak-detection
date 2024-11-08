@@ -29,6 +29,15 @@ class EDF_loading(DB_loading):
         self.path_database = path_to_data
  
     def load_data(self, file, verbose=False):
+        """
+        Procedure to handle a single EDF file. 
+
+        Returns: 
+            ecg (array): an array of ECG data 
+            label (array): label array denoting peak locations
+            fs (int): sampling frequency of ECG data
+            mask (array): mask array
+        """
         # load data
         record = mne.io.read_raw_edf(file)
         ecg = record.get_data()[:3,:]
